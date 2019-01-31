@@ -2,7 +2,7 @@ load('HRIRs.mat');
 HRIRs_w_torso=HRIRs;
 HRIRs_w_torso_l=HRIRs_w_torso(49:49+23,:);
 HRIRs_w_torso_r=HRIRs_w_torso(49+144:49+23+144,:);
-for i=1:size(HRRs_w_torso_l,1)
+for i=1:size(HRIRs_w_torso_l,1)
     HRTF(i).az=(i-1)*15;
     HRTF(i).hrir_l=HRIRs_w_torso_l(i,:);
     HRTF(i).hrir_r=HRIRs_w_torso_r(i,:);

@@ -489,6 +489,7 @@ function Next_Callback(hObject, eventdata, handles)
 % hObject    handle to Next (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.SubjectNum,'Enable','inactive')
 handles.HRTF_Pick=handles.R_HRTF_index(mod(handles.click_num,length(handles.hrtf_struct))+1);
 handles.hrir_r=handles.hrtf_struct(handles.HRTF_Pick).HRTF(handles.R_azs_num(handles.click_num)).hrir_r;
 handles.hrir_l=handles.hrtf_struct(handles.HRTF_Pick).HRTF(handles.R_azs_num(handles.click_num)).hrir_l;

@@ -22,7 +22,7 @@ function varargout = horizontal(varargin)
 
 % Edit the above text to modify the response to help horizontal
 
-% Last Modified by GUIDE v2.5 28-Jan-2019 16:29:18
+% Last Modified by GUIDE v2.5 29-Jan-2019 02:33:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -116,17 +116,18 @@ save('azs_ground_truth_1.mat', 'azs_ground_truth')
 choice_result=zeros(1,72);
 handles.choice_result=choice_result;
 handles.choice_result_r=handles.choice_result;
-% to initialize the sampling frequency
-for i=1:length(handles.hrtf_struct)
-    handles.fs(i) = handles.hrtf_struct(i).HRTF(1).srate;
-end
-set(handles.text_fs,'String',handles.hrtf_struct(R_HRTF_index(1)).HRTF(1).srate)
 % initialize a counter for count click save number
 click_num=1;
 handles.click_num=click_num;
 % initialize a counter for count test times
 test_num=1;
 handles.test_num=test_num;
+% to initialize the sampling frequency
+for i=1:length(handles.hrtf_struct)
+    handles.fs(i) = handles.hrtf_struct(i).HRTF(1).srate;
+end
+set(handles.text_fs,'String',handles.hrtf_struct(R_HRTF_index(1)).HRTF(1).srate)
+
 % to specify parameters for making input
 handles.sigRep = 10;
 handles.sigRepPrep = 10;
@@ -489,7 +490,8 @@ function Next_Callback(hObject, eventdata, handles)
 % hObject    handle to Next (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.HRTF_Pick=handles.R_HRTF_index(mod(handles.click_num,lenght(handles.hrtf_struct))+1);
+set(handles.SubjectNum,'Enable','inactive')
+handles.HRTF_Pick=handles.R_HRTF_index(mod(handles.click_num,length(handles.hrtf_struct))+1);
 handles.hrir_r=handles.hrtf_struct(handles.HRTF_Pick).HRTF(handles.R_azs_num(handles.click_num)).hrir_r;
 handles.hrir_l=handles.hrtf_struct(handles.HRTF_Pick).HRTF(handles.R_azs_num(handles.click_num)).hrir_l;
 IR_r=handles.hrir_r;
@@ -501,7 +503,8 @@ if isrow(left)
     right = right';
     v = [left,right];
 end
-sound(v,handles.fs);
+set(handles.text_fs,'String',handles.fs(handles.HRTF_Pick))
+sound(v,handles.fs(handles.HRTF_Pick));
 set(handles.Next,'Enable','off')
 set(handles.Save1,'Enable','on')
 %start a timer
@@ -699,6 +702,7 @@ if handles.click_num==12
     handles.click_num=1;
 end
 handles.test_num=handles.test_num+1;
+set(handles.edit_rep,'String',handles.test_num)
 if handles.test_num==120
     msgbox('Complete')
     set(handles.Save1,'Enable','off');
@@ -1054,15 +1058,36 @@ function Replay_Callback(hObject, eventdata, handles)
 % hObject    handle to Replay (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.hrir_r=handles.hrtf_struct(handles.R_azs_num(handles.click_num)).hrir_r;
-handles.hrir_l=handles.hrtf_struct(handles.R_azs_num(handles.click_num)).hrir_l;
 IR_r=handles.hrir_r;
 IR_l=handles.hrir_l;
-left = conv(IR_l,handles.mono);
-right = conv(IR_r,handles.mono);
+left = conv(IR_l,handles.mono(handles.HRTF_Pick).mono);
+right = conv(IR_r,handles.mono(handles.HRTF_Pick).mono);
 if isrow(left)
     left = left';
     right = right';
     v = [left,right];
 end
-sound(v,handles.fs);
+sound(v,handles.fs(handles.HRTF_Pick));
+
+
+
+function edit_rep_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_rep (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_rep as text
+%        str2double(get(hObject,'String')) returns contents of edit_rep as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_rep_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_rep (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
