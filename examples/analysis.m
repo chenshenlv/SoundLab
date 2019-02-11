@@ -5,21 +5,15 @@ clear;
 % actual data wil require different preprocessing.  Use this for
 % guidance.
 data = createData();
-rows = data.Truth==0;
-vars = {'HRTF','AvgError'};
-analysis_table = data(rows,vars);
-anova_data = table2array(analysis_table)';
 
-% prepping anova data
-y = anova_data(2,:);
-group = anova_data(1,:);
+err = table([1 2 3]','VariableNames',{'Errors'});
+rm = fitrm(data,'HRTFerr1-HRTFerr3~1','WithinDesign',err);
 
-% check norm
-figure;
-normplot(y)
+% check sphericity (auto done in ranova)
+mauchly(rm)
 
-% perform anova
-[p,tbl,stats] = anova1(y, group);
+% repeated measure anova
+ranova(rm)
 
-% perform multicompare
-[c,m,h,nms] = multcompare(stats);
+% state result:
+% F(2,12) = Fstat, p = pValue
